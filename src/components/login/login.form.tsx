@@ -1,29 +1,32 @@
 'use client'
-import React from 'react';
-import { Button, Checkbox, Form, Input } from 'antd';
+import React, { useState } from 'react';
+import { Button, Form, Input, message } from 'antd';
+import { handleLoginAntd } from '@/app/login/actions';
 
-const onFinish = (values: any) => {
-    console.log('Success:', values);
-};
-
-const onFinishFailed = (errorInfo: any) => {
-    console.log('Failed:', errorInfo);
-};
 
 type FieldType = {
     username?: string;
     password?: string;
-    remember?: string;
 };
 
-const LoginForm = () => (
-    <Form
+const LoginForm = () => {
+    const [isSubmit, setIsSubmit] = useState(false)
+    const onFinish = async (values: any) => {
+        setIsSubmit(true)
+        const res = await handleLoginAntd(values)
+        if (res?.data) {
+            message.success('Login successfully')
+        } else {
+            message.error('Login fail')
+        }
+        setIsSubmit(false)
+    };
+    return (<Form
         name="basic"
         labelCol={{ span: 8 }}
         wrapperCol={{ span: 16 }}
         style={{ maxWidth: 600 }}
         onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
         autoComplete="off"
     >
         <Form.Item<FieldType>
@@ -43,11 +46,11 @@ const LoginForm = () => (
         </Form.Item>
 
         <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" htmlType="submit" loading={isSubmit}>
                 Submit
             </Button>
         </Form.Item>
-    </Form>
-);
+    </Form>)
+};
 
 export default LoginForm;
